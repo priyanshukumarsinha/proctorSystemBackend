@@ -1,0 +1,120 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model Student {
+  id                 String  @id @default(cuid())
+  email              String  @unique
+  password           String
+  role               String  @default("STUDENT")
+  firstName          String?
+  lastName           String?
+  USN                String?
+  sem                Int?
+  phoneNumber        String?
+  fatherMobileNumber String?
+  motherMobileNumber String?
+  photoURL           String?
+
+  rollNo String?
+
+  createdAt        DateTime      @default(now())
+  updatedAt        DateTime      @updatedAt
+  appointProctorId String?
+  AppointProctor   Appointment[]
+}
+
+model Teacher {
+  id          String  @id @default(cuid())
+  email       String  @unique
+  password    String
+  role        String  @default("TEACHER")
+  firstName   String?
+  lastName    String?
+  phoneNumber String?
+  photoURL    String?
+
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+  Notification   Notification[]
+  AppointProctor Appointment[]
+  Timetable      Timetable[]
+}
+
+model Notification {
+  id        String   @id @default(cuid())
+  title     String
+  message   String
+  proctorId Teacher  @relation(fields: [teacherId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  teacherId String
+}
+
+model Appointment {
+  id        String   @id @default(cuid())
+  proctorId Teacher  @relation(fields: [teacherId], references: [id])
+  procteeId Student  @relation(fields: [studentId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  teacherId String
+  studentId String
+}
+
+model Timetable {
+  id        String   @id @default(cuid())
+  day       String
+  period    Int
+  startTime DateTime
+  endTime   DateTime
+  subject   String
+  proctorId Teacher  @relation(fields: [teacherId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  teacherId String
+}
+
+model Result{
+  id        String   @id @default(cuid())
+  studentId String
+  sem      Int
+  marks   Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Concerns{
+  id String @id @default(cuid())
+  studentId String
+  proctorId String
+  concern String
+  status String?
+  subject String
+  reply String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Meeting{
+  id String @id @default(cuid())
+  studentId String
+  proctorId String
+  date DateTime
+  status String?
+  time DateTime
+  Agenda String?
+  link String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
